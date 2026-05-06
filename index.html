@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学番検索</title>
+
+<style>
+body {
+  text-align: center;
+  font-family: sans-serif;
+  margin-top: 50px;
+}
+
+input, button {
+  font-size: 18px;
+  padding: 10px;
+  margin: 5px;
+}
+
+#result {
+  margin-top: 20px;
+  font-size: 24px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h2>学番を入力</h2>
+
+<input type="text" id="studentId" placeholder="学番">
+<button onclick="search()">検索</button>
+
+<div id="result"></div>
+
+<script>
+let allData = [];
+
+// CSV読み込み
+fetch('data.csv')
+  .then(res => res.text())
+  .then(text => {
+
+    const rows = text.split("\n");
+
+    // 3行目・4行目を取得（※0スタートなので2,3）
+    const idRow = rows[1].split(",");
+    const numberRow = rows[2].split(",");
+
+    // 1列目はラベルなので除外
+    const ids = idRow.slice(1);
+    const numbers = numberRow.slice(1);
+
+    // データ作成
+    ids.forEach((id, index) => {
+      allData.push({
+        id: id.replace(/\s/g, "").replace(/\r/g, ""),
+        number: numbers[index].trim()
+      });
+    });
+
+  });
+
+// 検索処理
+function search() {
+  const input = document.getElementById("studentId").value
+    .replace(/\s/g, "");
+
+  const resultArea = document.getElementById("result");
+
+  const found = allData.find(d => d.id == input);
+
+  if (found) {
+    resultArea.innerText = "番号: " + found.number;
+  } else {
+    resultArea.innerText = "該当する学番がありません";
+  }
+}
+</script>
+
+</body>
+</html>
